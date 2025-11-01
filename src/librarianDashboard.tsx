@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
+import { emailService } from './lib/emailService'
+import { EmailSettings } from './components/EmailSettings'
+import { checkAndSendReminders } from './lib/autoReminders'
 
 interface Book {
   id: number
@@ -22,7 +25,7 @@ interface BorrowRecord {
 }
 
 function LibrarianDashboard() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'transactions' | 'reminders'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'transactions' | 'reminders' | 'email'>('dashboard')
   const [books, setBooks] = useState<Book[]>([])
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -32,6 +35,7 @@ function LibrarianDashboard() {
   })
   const [recentTransactions, setRecentTransactions] = useState<BorrowRecord[]>([])
   const [overdueBooks, setOverdueBooks] = useState<BorrowRecord[]>([])
+  const [dueSoonBooks, setDueSoonBooks] = useState<BorrowRecord[]>([])
   const [newBook, setNewBook] = useState({
     isbn: '',
     name: '',
@@ -40,6 +44,7 @@ function LibrarianDashboard() {
     total_copies: ''
   })
   const [showAddBook, setShowAddBook] = useState(false)
+  const [sendingEmails, setSendingEmails] = useState(false)
 
   // Load dashboard stats
   const loadStats = async () => {
@@ -159,6 +164,45 @@ function LibrarianDashboard() {
     }
   }
 
+  // Load due soon books (within 5 days)
+  const loadDueSoon = async () => {
+    try {
+      const today = new Date()
+      const fiveDaysFromNow = new Date()
+      fiveDaysFromNow.setDate(today.getDate() + 5)
+
+      const { data, error } = await supabase
+        .from('borrowed_books')
+        .select('*')
+        .eq('returned', false)
+        .gte('due_date', today.toISOString())
+        .lte('due_date', fiveDaysFromNow.toISOString())
+        .order('due_date')
+
+      if (!error && data) {
+        const isbnList = data.map(b => b.book_isbn)
+        const { data: booksData } = await supabase
+          .from('books')
+          .select('isbn, name')
+          .in('isbn', isbnList)
+
+        const booksMap = new Map<string, string>()
+        booksData?.forEach(book => {
+          booksMap.set(book.isbn, book.name)
+        })
+
+        const enriched = data.map(item => ({
+          ...item,
+          book_name: booksMap.get(item.book_isbn)
+        }))
+
+        setDueSoonBooks(enriched as BorrowRecord[])
+      }
+    } catch (error) {
+      console.error('Error loading due soon:', error)
+    }
+  }
+
   // Add new book
   const handleAddBook = async () => {
     if (!newBook.isbn || !newBook.name || !newBook.author || !newBook.total_copies) {
@@ -254,37 +298,115 @@ function LibrarianDashboard() {
     }
   }
 
-  // Send reminder emails (mock implementation)
+  // Send reminder emails automatically (all overdue and due soon)
   const sendReminders = async () => {
+    if (sendingEmails) return
+    
+    setSendingEmails(true)
     try {
-      // Get all overdue and due soon books
-      const today = new Date()
-      const fiveDaysFromNow = new Date()
-      fiveDaysFromNow.setDate(today.getDate() + 5)
-
-      const { data: dueSoon, error } = await supabase
-        .from('borrowed_books')
-        .select('*')
-        .eq('returned', false)
-        .gte('due_date', today.toISOString())
-        .lte('due_date', fiveDaysFromNow.toISOString())
-
-      const overdueCount = overdueBooks.length
-      const dueSoonCount = dueSoon?.length || 0
-
-      // In production, this would send actual emails via Gmail API
-      alert(`Reminders sent!\nOverdue: ${overdueCount}\nDue Soon (5 days): ${dueSoonCount}\n\n(Currently in demo mode - emails logged to console)`)
-      
-      // Log what would be sent
-      console.log('Would send reminders to:', {
-        overdue: overdueBooks.map(b => b.user_email),
-        dueSoon: dueSoon?.map(b => b.user_email)
+      // Prepare reminders for overdue books
+      const overdueReminders = overdueBooks.map(record => {
+        const daysOverdue = Math.floor(
+          (new Date().getTime() - new Date(record.due_date).getTime()) / (1000 * 60 * 60 * 24)
+        )
+        return {
+          studentEmail: record.user_email,
+          studentName: record.user_email.split('@')[0], // Use email username as name
+          bookTitle: record.book_name || record.book_isbn,
+          dueDate: record.due_date,
+          daysLeft: -daysOverdue,
+          isOverdue: true
+        }
       })
+
+      // Prepare reminders for due soon books
+      const dueSoonReminders = dueSoonBooks.map(record => {
+        const today = new Date()
+        const dueDate = new Date(record.due_date)
+        const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        return {
+          studentEmail: record.user_email,
+          studentName: record.user_email.split('@')[0],
+          bookTitle: record.book_name || record.book_isbn,
+          dueDate: record.due_date,
+          daysLeft,
+          isOverdue: false
+        }
+      })
+
+      const allReminders = [...overdueReminders, ...dueSoonReminders]
+
+      if (allReminders.length === 0) {
+        alert('No reminders to send!')
+        setSendingEmails(false)
+        return
+      }
+
+      // Send bulk reminders
+      const result = await emailService.sendBulkReminders(allReminders)
+
+      if (result.failed === 0) {
+        alert(`✅ Successfully sent ${result.success} reminder email(s)!`)
+      } else {
+        alert(`Sent ${result.success} email(s), ${result.failed} failed.\n\nErrors:\n${result.errors.join('\n')}`)
+      }
+
+      // Reload to show updated status
+      loadOverdue()
+      loadDueSoon()
     } catch (error) {
       console.error('Error sending reminders:', error)
-      alert('Error sending reminders')
+      alert(`Error sending reminders: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check your email configuration in the Email Settings tab.`)
+    } finally {
+      setSendingEmails(false)
     }
   }
+
+  // Send reminder for a specific book
+  const sendIndividualReminder = async (record: BorrowRecord) => {
+    try {
+      const today = new Date()
+      const dueDate = new Date(record.due_date)
+      const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+      const isOverdue = daysDiff < 0
+      const daysLeft = Math.abs(daysDiff)
+
+      if (isOverdue) {
+        await emailService.sendOverdueNotice(
+          record.user_email,
+          record.user_email.split('@')[0],
+          record.book_name || record.book_isbn,
+          record.due_date,
+          daysLeft
+        )
+      } else {
+        await emailService.sendDueReminder(
+          record.user_email,
+          record.user_email.split('@')[0],
+          record.book_name || record.book_isbn,
+          record.due_date,
+          daysLeft
+        )
+      }
+
+      alert(`Reminder sent successfully to ${record.user_email}!`)
+    } catch (error) {
+      console.error('Error sending individual reminder:', error)
+      alert(`Failed to send reminder: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  // Initialize email service with default settings on component mount
+  useEffect(() => {
+    // Pre-configure email service with permanent defaults
+    emailService.configure({
+      emailjsServiceId: 'service_ugxce6h',
+      emailjsTemplateId: 'template_j7w14xq',
+      emailjsPublicKey: 'caKYX4F870Uld9Mg8',
+      senderEmail: 'libdemo142536@gmail.com',
+      senderName: 'CampusReads Library'
+    })
+  }, [])
 
   useEffect(() => {
     loadStats()
@@ -294,6 +416,7 @@ function LibrarianDashboard() {
       loadTransactions()
     } else if (activeTab === 'reminders') {
       loadOverdue()
+      loadDueSoon()
     }
   }, [activeTab])
 
@@ -302,9 +425,12 @@ function LibrarianDashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h2 className="dashboard-title">Librarian Dashboard</h2>
-        <p className="welcome-text">Welcome, {userEmail}!</p>
-        <button className="logout-button" onClick={() => {
+        <div className="header-left">
+          <h2 className="dashboard-title">Librarian Dashboard</h2>
+          <p className="welcome-text">Welcome, {userEmail}!</p>
+        </div>
+        <button className="logout-button" onClick={async () => {
+          await supabase.auth.signOut()
           localStorage.clear()
           window.location.reload()
         }}>
@@ -338,6 +464,12 @@ function LibrarianDashboard() {
         >
           📧 Reminders
         </button>
+        <button 
+          className={`tab-button ${activeTab === 'email' ? 'active' : ''}`}
+          onClick={() => setActiveTab('email')}
+        >
+          ⚙️ Email Settings
+        </button>
       </div>
 
       {/* Dashboard Tab */}
@@ -361,9 +493,17 @@ function LibrarianDashboard() {
               <p className="stat-number">{stats.overdueBooks}</p>
             </div>
           </div>
-          <button className="action-button" onClick={sendReminders}>
-            📧 Send Reminders (Gmail)
+          <button 
+            className="action-button" 
+            onClick={sendReminders}
+            disabled={sendingEmails}
+            style={{ marginTop: '1.5rem' }}
+          >
+            {sendingEmails ? '📧 Sending Reminders...' : '📧 Send All Reminders'}
           </button>
+          <p style={{ marginTop: '1rem', color: '#666', fontSize: '0.9rem' }}>
+            This will send reminders to all students with overdue or due soon books.
+          </p>
         </div>
       )}
 
@@ -471,37 +611,96 @@ function LibrarianDashboard() {
         <div className="dashboard-section">
           <div className="section-header">
             <h3 className="section-title">Overdue Books & Reminders</h3>
-            <button className="action-button" onClick={sendReminders}>
-              📧 Send Reminders via Gmail
+            <button 
+              className="action-button" 
+              onClick={sendReminders}
+              disabled={sendingEmails}
+            >
+              {sendingEmails ? '📧 Sending...' : '📧 Send All Reminders'}
             </button>
           </div>
-          <div className="overdue-list">
-            {overdueBooks.map((record) => {
-              const daysOverdue = Math.floor(
-                (new Date().getTime() - new Date(record.due_date).getTime()) / (1000 * 60 * 60 * 24)
-              )
-              return (
-                <div key={record.id} className="overdue-card">
-                  <div className="overdue-info">
-                    <p><strong>{record.book_name || record.book_isbn}</strong></p>
-                    <p>Student: {record.user_email}</p>
-                    <p>Due Date: {new Date(record.due_date).toLocaleDateString()}</p>
-                    <p className="overdue-days">⚠️ {daysOverdue} days overdue</p>
-                  </div>
-                  <button 
-                    className="action-button"
-                    onClick={() => handleReturnBook(record.id, record.book_isbn)}
-                  >
-                    Mark as Returned
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-          {overdueBooks.length === 0 && (
-            <p className="empty-message">No overdue books! 🎉</p>
+
+          {/* Overdue Books Section */}
+          {overdueBooks.length > 0 && (
+            <div>
+              <h4 className="subsection-title">⚠️ Overdue Books ({overdueBooks.length})</h4>
+              <div className="overdue-list">
+                {overdueBooks.map((record) => {
+                  const daysOverdue = Math.floor(
+                    (new Date().getTime() - new Date(record.due_date).getTime()) / (1000 * 60 * 60 * 24)
+                  )
+                  return (
+                    <div key={record.id} className="overdue-card">
+                      <div className="overdue-info">
+                        <p><strong>{record.book_name || record.book_isbn}</strong></p>
+                        <p>Student: {record.user_email}</p>
+                        <p>Due Date: {new Date(record.due_date).toLocaleDateString()}</p>
+                        <p className="overdue-days">⚠️ {daysOverdue} days overdue</p>
+                      </div>
+                      <div className="card-actions">
+                        <button 
+                          className="action-button email-button"
+                          onClick={() => sendIndividualReminder(record)}
+                          title="Send reminder email"
+                        >
+                          📧 Send Email
+                        </button>
+                        <button 
+                          className="action-button return-button"
+                          onClick={() => handleReturnBook(record.id, record.book_isbn)}
+                        >
+                          Mark as Returned
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Due Soon Books Section */}
+          {dueSoonBooks.length > 0 && (
+            <div style={{ marginTop: '2rem' }}>
+              <h4 className="subsection-title">⏰ Due Soon (Within 5 Days) ({dueSoonBooks.length})</h4>
+              <div className="overdue-list">
+                {dueSoonBooks.map((record) => {
+                  const today = new Date()
+                  const dueDate = new Date(record.due_date)
+                  const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+                  return (
+                    <div key={record.id} className="book-card warning">
+                      <div className="overdue-info">
+                        <p><strong>{record.book_name || record.book_isbn}</strong></p>
+                        <p>Student: {record.user_email}</p>
+                        <p>Due Date: {dueDate.toLocaleDateString()}</p>
+                        <p className="overdue-days">⏰ {daysLeft} day(s) left</p>
+                      </div>
+                      <div className="card-actions">
+                        <button 
+                          className="action-button email-button"
+                          onClick={() => sendIndividualReminder(record)}
+                          title="Send reminder email"
+                        >
+                          📧 Send Reminder
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {overdueBooks.length === 0 && dueSoonBooks.length === 0 && (
+            <p className="empty-message">No overdue or due soon books! 🎉</p>
           )}
         </div>
+      )}
+
+      {/* Email Settings Tab */}
+      {activeTab === 'email' && (
+        <EmailSettings onSave={() => alert('Email settings saved successfully!')} />
       )}
     </div>
   )

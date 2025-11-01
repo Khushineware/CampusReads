@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { SearchBooks } from './components/SearchBooks'
 import { Analytics } from './components/Analytics'
+import { StudentAnalytics } from './components/StudentAnalytics'
 import { Recommendations } from './components/Recommendations'
 import { CameraScanner } from './components/CameraScanner'
 import { BookDebug } from './components/BookDebug'
@@ -39,7 +40,7 @@ function StudentDashboard() {
 
     // Normalize ISBN (remove spaces and dashes for comparison)
     const normalizedISBN = normalizeISBN(isbnValue)
-    
+
     try {
       console.log('Attempting to borrow book with ISBN:', { original: isbnValue, normalized: normalizedISBN })
       
@@ -189,32 +190,32 @@ function StudentDashboard() {
       const isbnList = borrowedBooks.map(bb => bb.book_isbn)
       
       if (isbnList.length > 0) {
-        const { data: booksData, error: booksError } = await supabase
-          .from('books')
+      const { data: booksData, error: booksError } = await supabase
+        .from('books')
           .select('isbn, name, author')
-          .in('isbn', isbnList)
+        .in('isbn', isbnList)
 
-        console.log('Loaded books data:', { booksData, booksError })
+      console.log('Loaded books data:', { booksData, booksError })
 
         // Create a map of ISBN to book details
         const booksMap = new Map<string, { name: string; author: string }>()
-        if (booksData) {
-          booksData.forEach(book => {
+      if (booksData) {
+        booksData.forEach(book => {
             booksMap.set(book.isbn, { name: book.name, author: book.author })
-          })
-        }
+        })
+      }
 
         // Combine the data with full book information
         const transformedData = borrowedBooks.map((item: any) => {
           const bookInfo = booksMap.get(item.book_isbn)
           return {
-            ...item,
+        ...item,
             book_name: bookInfo?.name || 'Unknown Book',
             book_author: bookInfo?.author || 'Unknown Author'
           }
         })
 
-        setMyBooks(transformedData)
+      setMyBooks(transformedData)
       } else {
         setMyBooks(borrowedBooks)
       }
@@ -267,9 +268,12 @@ function StudentDashboard() {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h2 className="dashboard-title">Student Dashboard</h2>
-        <p className="welcome-text">Welcome, {userEmail}!</p>
-        <button className="logout-button" onClick={() => {
+        <div className="header-left">
+      <h2 className="dashboard-title">Student Dashboard</h2>
+      <p className="welcome-text">Welcome, {userEmail}!</p>
+        </div>
+        <button className="logout-button" onClick={async () => {
+          await supabase.auth.signOut()
           localStorage.clear()
           window.location.reload()
         }}>
@@ -314,19 +318,19 @@ function StudentDashboard() {
       {/* Dashboard Tab - My Books */}
       {activeTab === 'dashboard' && (
         <>
-          <div className="dashboard-section">
-            <h3 className="section-title">Borrow a Book</h3>
-            <div className="borrow-form">
-              <input 
-                className="input-field"
-                type="text"
+      <div className="dashboard-section">
+        <h3 className="section-title">Borrow a Book</h3>
+        <div className="borrow-form">
+          <input 
+            className="input-field"
+            type="text"
                 placeholder="Enter or Scan ISBN"
-                value={isbn}
-                onChange={(e) => setIsbn(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && borrowBook()}
-              />
+            value={isbn}
+            onChange={(e) => setIsbn(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && borrowBook()}
+          />
               <button className="action-button" onClick={() => borrowBook()}>Borrow</button>
-            </div>
+        </div>
             {!showScanner && (
               <button className="scanner-button" onClick={() => setShowScanner(true)}>
                 📷 Use Camera to Scan ISBN
@@ -341,14 +345,14 @@ function StudentDashboard() {
                 }}
               />
             )}
-          </div>
+      </div>
 
-          <div className="dashboard-section">
-            <h3 className="section-title">My Borrowed Books</h3>
-            {myBooks.length === 0 ? (
-              <p className="empty-message">No books currently borrowed</p>
-            ) : (
-              <div className="books-list">
+      <div className="dashboard-section">
+        <h3 className="section-title">My Borrowed Books</h3>
+        {myBooks.length === 0 ? (
+          <p className="empty-message">No books currently borrowed</p>
+        ) : (
+          <div className="books-list">
                 {myBooks.map((book) => {
                   const dueDate = new Date(book.due_date)
                   const today = new Date()
@@ -394,12 +398,12 @@ function StudentDashboard() {
 
       {/* Recommendations Tab */}
       {activeTab === 'recommendations' && (
-        <Recommendations onBorrow={borrowBook} />
+        <Recommendations userEmail={userEmail || ''} onBorrow={borrowBook} />
       )}
 
       {/* Analytics Tab */}
       {activeTab === 'analytics' && (
-        <Analytics />
+        <StudentAnalytics userEmail={userEmail || ''} />
       )}
 
       {/* Debug Tab */}
