@@ -1,0 +1,584 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.login-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+.login-title {
+  color: #1a73e8;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.login-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #1557b0;
+}
+
+.dashboard {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.dashboard-title {
+  color: #1a73e8;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+.welcome-text {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+body {
+  background-color: #f5f5f5;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.dashboard-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.section-title {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #1a73e8;
+  padding-bottom: 0.5rem;
+}
+
+.borrow-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.action-button {
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.action-button:hover {
+  background-color: #1557b0;
+}
+
+.books-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.book-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #1a73e8;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.book-card p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.empty-message {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Role Selection */
+.role-selection {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.role-selection h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.role-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.role-button {
+  flex: 1;
+  padding: 1.5rem;
+  border: 2px solid #1a73e8;
+  background-color: white;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.role-button:hover {
+  background-color: #f0f7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(26, 115, 232, 0.2);
+}
+
+.role-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #f0f7ff;
+  border-radius: 6px;
+}
+
+.change-role-button {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.change-role-button:hover {
+  background-color: #555;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.tab-button {
+  background-color: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  color: #1a73e8;
+  background-color: #f0f7ff;
+}
+
+.tab-button.active {
+  color: #1a73e8;
+  border-bottom-color: #1a73e8;
+  font-weight: bold;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Search Box */
+.search-box {
+  margin-bottom: 1.5rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border-left: 4px solid #1a73e8;
+}
+
+.stat-card.overdue {
+  border-left-color: #dc3545;
+}
+
+.stat-card h3, .stat-card h4 {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a73e8;
+}
+
+.stat-card.overdue .stat-number {
+  color: #dc3545;
+}
+
+/* Transaction Cards */
+.transactions-list, .overdue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.transaction-card, .overdue-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #1a73e8;
+}
+
+.overdue-card {
+  border-left-color: #dc3545;
+}
+
+.transaction-info, .overdue-info {
+  flex: 1;
+}
+
+.transaction-info p, .overdue-info p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.overdue-days {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Add Book Form */
+.add-book-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* Book Info */
+.book-info {
+  flex: 1;
+}
+
+.book-info p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.book-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.book-card.overdue {
+  border-left-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.book-card.warning {
+  border-left-color: #ffc107;
+  background-color: #fffbf0;
+}
+
+.overdue-text {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.reminder-note {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+.delete-button, .return-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.delete-button:hover, .return-button:hover {
+  background-color: #c82333;
+}
+
+/* Scanner Section */
+.scanner-button {
+  margin-top: 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.scanner-button:hover {
+  background-color: #218838;
+}
+
+.scanner-section {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.scanner-note {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+/* Favorite Categories */
+.favorite-categories {
+  margin-top: 2rem;
+}
+
+.favorite-categories h4 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.category-count {
+  color: #666;
+}
+
+.recommendation-subtitle {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* Camera Scanner */
+.camera-scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.camera-scanner-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+  position: relative;
+}
+
+.camera-scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.camera-scanner-header h3 {
+  margin: 0;
+  color: #1a73e8;
+}
+
+.close-camera-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.close-camera-button:hover {
+  background-color: #c82333;
+}
+
+.camera-scanner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.camera-video {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  border-radius: 8px;
+  border: 3px solid #1a73e8;
+  background-color: #000;
+}
+
+.scanner-guide {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f0f7ff;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.scanner-guide p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.camera-error {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+}
+
+.search-hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.book-author {
+  color: #666;
+  font-size: 0.95rem;
+}
