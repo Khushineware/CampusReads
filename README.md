@@ -4,11 +4,7 @@ A modern and intelligent **Library Management System** built with **React**, **N
 
 ---
 ## Team Git_gud
-### Members
-1. khushi Neware
-2. Yash Wandhare
-3. Anshuman Patil
-4. Roopam Zade
+
 ## ✨ Features  
 
 ### 👤 Student Features  
