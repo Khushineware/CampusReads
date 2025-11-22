@@ -1,140 +1,125 @@
-# 📚 CampusReads - Smart Library Management System  
+# 📚 CampusReads – Smart Library Management System
 
-A modern and intelligent **Library Management System** built with **React**, **Node.js**, **TypeScript**, and **Supabase**, featuring **AI-powered book recommendations** and an intuitive user interface for both students and librarians.  
-
----
-## Team Git_gud
-### Members
-1. khushi Neware
-2. Yash Wandhare
-3. Anshuman Patil
-4. Roopam Zade
-## ✨ Features  
-
-### 👤 Student Features  
-- ✅ **Login Page** - Role-based authentication for students  
-- ✅ **ISBN Scanning/Input** - Scan or manually enter ISBN to borrow books  
-- ✅ **Book Search** - Search books by title, author, ISBN, or category  
-- ✅ **Smart Recommendations** - LLM-powered personalized book suggestions based on reading history  
-- ✅ **Reading Analytics** - Track reading habits, favorite categories, and statistics  
-- ✅ **Borrow/Return Books** - Easy book borrowing and return process  
-- ✅ **Email Reminders** - Automatic reminders for due/overdue books (via Gmail)  
-
-### 👨‍💼 Librarian Features  
-- ✅ **Login Page** - Role-based authentication for librarians  
-- ✅ **Dashboard** - View library statistics (total books, borrowed, overdue, available)  
-- ✅ **Inventory Management** - Add, view, and delete books from catalog  
-- ✅ **Recent Transactions** - See recently borrowed/submitted books  
-- ✅ **Smart Reminders** - Automatically identify and send reminders for due/overdue books via Gmail  
-- ✅ **Overdue Management** - View and manage overdue books  
+CampusReads is a modern library management platform designed to simplify workflows for students and librarians. It includes role-based access, fast borrowing tools, real-time inventory, automated reminders, analytics, and personalized book recommendations powered by a custom collaborative filtering model.
 
 ---
 
-## 📚 Usage  
+## 🔑 Demo Login Credentials
 
-### For Students  
+**Student Account**  
+Email: student@test.edu  
+Password: student123  
 
-1. **Login** - Select "Student" role and enter your credentials  
-2. **Borrow Books** - Use the "My Books" tab to:  
-   - Enter ISBN manually  
-   - Or click "Use Camera to Scan ISBN" (placeholder for camera functionality)  
-3. **Search Books** - Use the "Search" tab to find books by various criteria  
-4. **Get Recommendations** - Check the "Recommendations" tab for personalized suggestions  
-5. **View Analytics** - Track your reading habits in the "Analytics" tab  
-
-### For Librarians  
-
-1. **Login** - Select "Librarian" role and enter credentials  
-2. **Dashboard** - View library statistics and overview  
-3. **Inventory** - Manage book catalog:  
-   - Add new books  
-   - View all books  
-   - Delete books  
-4. **Transactions** - View recent borrow/return activities  
-5. **Reminders** - Send email reminders for overdue books:  
-   - Click "Send Reminders via Gmail" to send reminders to all students with due/overdue books  
-   - Currently in demo mode (logs to console)  
+**Librarian Account**  
+Email: librarian@test.edu  
+Password: librarian123  
 
 ---
 
-## 🤖 AI-Powered Recommendations  
+## ✨ Features
 
-CampusReads integrates a **Locally Trained LLM Model** to generate smart and personalized book recommendations.  
+### 👤 Student Features
+- **Secure Login** with role-based access  
+- **ISBN Scanning/Input** to borrow books  
+- **Search Books** by title, author, ISBN, or category  
+- **Personalized Recommendations** via a custom TypeScript collaborative-filtering engine  
+- **Reading Analytics** showing habits and favorite categories  
+- **Borrow / Return Books** from a dedicated dashboard  
+- **Automated Email Reminders** for due and overdue books  
 
-- Uses **student reading history**, **categories**, and **academic subjects**  
-- Provides **context-aware and personalized suggestions**  
-- Improves student engagement with **data-driven learning insights**  
-
----
-
-## 🔧 Email Reminders (Gmail Integration)  
-
-The system includes automated email reminder functionality:  
-
-- **Automatic Detection**: Identifies books that are:  
-  - Overdue (past due date)  
-  - Due soon (within 5 days)  
-
-- **Manual Trigger**: Librarians can manually send reminders from the Reminders tab  
-
-- **Future Enhancement**: To integrate actual Gmail API:  
-  1. Set up Gmail API credentials  
-  2. Configure OAuth 2.0  
-  3. Update the reminder sending logic in `librarianDashboard.tsx`  
-
-Currently, reminders are logged to the console in demo mode.  
+### 👨‍💼 Librarian Features
+- **Secure Login** with librarian permissions  
+- **Dashboard Overview** with live library statistics  
+- **Inventory Management**: add, view, and delete books  
+- **Recent Transactions** for quick monitoring  
+- **Automated Reminder System** for due/overdue books  
+- **Overdue Management** with filters and quick actions  
 
 ---
 
-## 📊 Features Overview  
+## 📚 How to Use
 
-### Student Dashboard  
-- **My Books**: View borrowed books, due dates, and return functionality  
-- **Search**: Comprehensive book search with filters  
-- **Recommendations**: Personalized book suggestions via LLM  
-- **Analytics**: Reading statistics and insights  
+### Students
+1. Log in using the student credentials  
+2. Borrow books via ISBN entry or scan  
+3. Search and filter books  
+4. View personalized recommendations  
+5. Track reading stats in the analytics view  
 
-### Librarian Dashboard  
-- **Dashboard**: Library statistics and quick actions  
-- **Inventory**: Complete catalog management  
-- **Transactions**: Recent activity tracking  
-- **Reminders**: Overdue book management and email sending  
+### Librarians
+1. Log in using librarian credentials  
+2. Manage inventory (add / view / delete)  
+3. View recent activities  
+4. Monitor overdue books  
+5. Send automatic reminders from the reminders panel  
 
 ---
 
-## 🛠️ Technology Stack  
+## 🤖 Recommendation System
+
+CampusReads includes a collaborative-filtering recommendation algorithm built entirely in **TypeScript**.  
+It uses:
+- Reading history  
+- Book categories  
+- Academic interests  
+
+This generates relevant and personalized book suggestions for each student.
+
+---
+
+## 📧 Automated Email Reminders (EmailJS Integration)
+
+The system uses **EmailJS** to send fully functional email reminders.  
+It automatically identifies:
+- Overdue books  
+- Books due within a few days  
+
+Reminders can be triggered directly from the librarian dashboard and are sent in real-time.
+
+---
+
+## 📊 Dashboards Overview
+
+### Student Dashboard
+- Borrowed books  
+- Due dates  
+- Personalized recommendations  
+- Reading analytics  
+
+### Librarian Dashboard
+- Library statistics  
+- Inventory controls  
+- Recent transactions  
+- Reminder system  
+- Overdue management  
+
+---
+
+## 🛠️ Technology Stack
 
 | Layer | Technology | Description |
-|-------|-------------|-------------|
-| **Frontend** | **React 19 + TypeScript** | Component-based modern UI framework |
-| **Styling** | **CSS3 + TailwindCSS** | For fast, modern, and responsive design |
-| **Backend** | **Node.js + TypeScript** | Handles app logic, APIs, and communication with Supabase |
-| **Database** | **Supabase (PostgreSQL + SQL)** | Cloud-based backend for authentication and data storage |
-| **AI Engine** | **Custom Trained LLM Model** | Provides intelligent and context-aware book recommendations |
-| **Build Tool** | **Vite** | Lightning-fast build tool for React apps |
+|-------|-----------|-------------|
+| Frontend | React 19 + TypeScript | Component-based modern UI |
+| Styling | CSS3 + TailwindCSS | Fast, responsive UI design |
+| Backend | Node.js + TypeScript | App logic + API handling |
+| Database | Supabase (PostgreSQL) | Auth + data storage |
+| Email | EmailJS API | Automated email reminders |
+| AI Engine | Custom TS Model | Collaborative filtering recommendations |
+| Build Tool | Vite | Dev/build tooling |
 
 ---
 
-## 📝 Notes  
+## 🔐 Authentication
 
-- The system uses **Supabase** for authentication and database management  
-- **LLM model** enhances book recommendations using user behavior and reading data  
-- **ISBN scanning** currently uses a placeholder (can be enhanced with a barcode scanner library)  
-- **Email reminders** are in demo mode (ready for Gmail API integration)  
-- All core features are fully functional and integrated with Supabase  
+All users must exist in **Supabase Auth** with their correct roles (`student` or `librarian`).  
+Demo credentials are provided above for quick access.
 
 ---
 
-## 🔐 Authentication  
+## 📄 License
 
-Users must be registered in **Supabase Auth** with corresponding entries in the `users` table with the correct role (`student` or `librarian`).  
-
----
-
-## 📄 License  
-
-**MIT License**  
+**MIT License**
 
 ---
 
-**CampusReads** – Smart Library Management for Modern Campuses 📖💡
+**CampusReads — Modern, practical library management.**
