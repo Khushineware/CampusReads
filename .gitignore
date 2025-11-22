@@ -30,3 +30,6 @@ src/components/EmailSettings.tsx
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify
