@@ -13,12 +13,12 @@ interface EmailData {
 
 class EmailService {
   private static instance: EmailService
-  // Permanent EmailJS configuration
-  private emailjsServiceId: string = 'service_ugxce6h'
-  private emailjsTemplateId: string = 'template_j7w14xq'
-  private emailjsPublicKey: string = 'caKYX4F870Uld9Mg8'
+  // EmailJS configuration from environment variables
+  private emailjsServiceId: string = import.meta.env.VITE_EMAILJS_SERVICE_ID || ''
+  private emailjsTemplateId: string = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || ''
+  private emailjsPublicKey: string = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
   private gmailApiKey: string = ''
-  private senderEmail: string = 'libdemo142536@gmail.com'
+  private senderEmail: string = import.meta.env.VITE_SENDER_EMAIL || 'library@campus.edu'
   private senderName: string = 'CampusReads Library'
 
   private constructor() {

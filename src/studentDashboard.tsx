@@ -5,7 +5,6 @@ import { Analytics } from './components/Analytics'
 import { StudentAnalytics } from './components/StudentAnalytics'
 import { Recommendations } from './components/Recommendations'
 import { CameraScanner } from './components/CameraScanner'
-import { BookDebug } from './components/BookDebug'
 
 interface BorrowedBook {
   id: number
@@ -19,7 +18,7 @@ interface BorrowedBook {
 }
 
 function StudentDashboard() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'search' | 'analytics' | 'recommendations' | 'debug'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'search' | 'analytics' | 'recommendations'>('dashboard')
   const [isbn, setIsbn] = useState('')
   const [myBooks, setMyBooks] = useState<BorrowedBook[]>([])
   const [showScanner, setShowScanner] = useState(false)
@@ -307,12 +306,6 @@ function StudentDashboard() {
         >
           📊 Analytics
         </button>
-        <button 
-          className={`tab-button ${activeTab === 'debug' ? 'active' : ''}`}
-          onClick={() => setActiveTab('debug')}
-        >
-          🔧 Debug Books
-        </button>
       </div>
 
       {/* Dashboard Tab - My Books */}
@@ -404,11 +397,6 @@ function StudentDashboard() {
       {/* Analytics Tab */}
       {activeTab === 'analytics' && (
         <StudentAnalytics userEmail={userEmail || ''} />
-      )}
-
-      {/* Debug Tab */}
-      {activeTab === 'debug' && (
-        <BookDebug />
       )}
     </div>
   )

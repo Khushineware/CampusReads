@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { emailService } from './lib/emailService'
-import { EmailSettings } from './components/EmailSettings'
 import { checkAndSendReminders } from './lib/autoReminders'
 
 interface Book {
@@ -25,7 +24,7 @@ interface BorrowRecord {
 }
 
 function LibrarianDashboard() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'transactions' | 'reminders' | 'email'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory' | 'transactions' | 'reminders'>('dashboard')
   const [books, setBooks] = useState<Book[]>([])
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -396,14 +395,14 @@ function LibrarianDashboard() {
     }
   }
 
-  // Initialize email service with default settings on component mount
+  // Initialize email service with environment variables on component mount
   useEffect(() => {
-    // Pre-configure email service with permanent defaults
+    // Configure email service from environment variables
     emailService.configure({
-      emailjsServiceId: 'service_ugxce6h',
-      emailjsTemplateId: 'template_j7w14xq',
-      emailjsPublicKey: 'caKYX4F870Uld9Mg8',
-      senderEmail: 'libdemo142536@gmail.com',
+      emailjsServiceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      emailjsTemplateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      emailjsPublicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      senderEmail: import.meta.env.VITE_SENDER_EMAIL,
       senderName: 'CampusReads Library'
     })
   }, [])
@@ -463,12 +462,6 @@ function LibrarianDashboard() {
           onClick={() => setActiveTab('reminders')}
         >
           📧 Reminders
-        </button>
-        <button 
-          className={`tab-button ${activeTab === 'email' ? 'active' : ''}`}
-          onClick={() => setActiveTab('email')}
-        >
-          ⚙️ Email Settings
         </button>
       </div>
 
@@ -698,10 +691,6 @@ function LibrarianDashboard() {
         </div>
       )}
 
-      {/* Email Settings Tab */}
-      {activeTab === 'email' && (
-        <EmailSettings onSave={() => alert('Email settings saved successfully!')} />
-      )}
     </div>
   )
 }
